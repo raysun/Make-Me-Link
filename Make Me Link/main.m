@@ -2,7 +2,7 @@
 //  main.m
 //  Make Me Link
 //
-//  Created by Karen and Ray Sun on 7/19/15.
+//  Created by Ray Sun on 7/19/15.
 //  Copyright © 2015 Ray Sun. All rights reserved.
 //
 

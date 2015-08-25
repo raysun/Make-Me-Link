@@ -2,7 +2,7 @@
 //  ButtonCollectionViewController.m
 //  Make Me Link
 //
-//  Created by Karen and Ray Sun on 7/19/15.
+//  Created by Ray Sun on 7/19/15.
 //  Copyright © 2015 Ray Sun. All rights reserved.
 //
 
@@ -17,69 +17,15 @@
     NSIndexPath *_previouslySelectedIndex;
     NSArray *_buttonData;
     BOOL _musicAutomaticallyStarted;
-//    CMMotionActivityManager *_motionManager;
 }
 @property CMMotionActivityManager *motionManager;
 
 @end
 
-
 @implementation ButtonCollectionViewController
 
-const int BUTTONINDEX_LABEL = 0;
-const int BUTTONINDEX_IMAGE = 1;
-const int BUTTONINDEX_MUSIC = 2;
+enum buttonindex {BUTTONINDEX_LABEL, BUTTONINDEX_IMAGE, BUTTONINDEX_MUSIC};
 static NSString * const reuseIdentifier = @"cell";
-
-/* Might be needed for the motion detection but actually I don't think so
-- (BOOL)canBecomeFirstResponder {
-    return YES;
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [self becomeFirstResponder];
-}
-*/
-
-/* Was going to implement real swordplay but not yet
-- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    if (motion == UIEventSubtypeMotionShake)
-    {
-            //__block BOOL isVertical = NO;
-        // User was shaking the device. Post a notification named "shake."
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"shake" object:self];
-        
-        self.motionManager = [[CMMotionManager alloc] init];
-        self.motionManager.accelerometerUpdateInterval = 1;
-        
-        if ([self.motionManager isAccelerometerAvailable])
-        {
-            NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-            [self.motionManager startAccelerometerUpdatesToQueue:queue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-
- 
-                    NSLog(@"%f %f %f",accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
-                    if (accelerometerData.acceleration.y < -0.9) {
-                        NSURL *musicURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"shield" ofType:@"wav"]];
-                        _audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:musicURL error:nil];
-                        [_audioPlayer prepareToPlay];
-                        [_audioPlayer play];
-                    } else {
-                        NSURL *musicURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"swordSpin" ofType:@"wav"]];
-                        _audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:musicURL error:nil];
-                        [_audioPlayer prepareToPlay];
-                        [_audioPlayer play];
-                    }
-//                    NSLog(@"%i", isVertical);
-                    [self.motionManager stopAccelerometerUpdates];
-                });
-            }];
-        } else
-            NSLog(@"not active");
-    }
-}
-*/
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -88,7 +34,8 @@ static NSString * const reuseIdentifier = @"cell";
     // self.clearsSelectionOnViewWillAppear = NO;
     
     // Register cell classes
-    // ray: apparently the default code registers the cell class, but you can't do it if you want to use the prototype. I guess because the cell type is implicit with the prototype
+    
+    // The default code registers the cell class, but you can't do it if you want to use the prototype. I think because the cell type is implicit with the prototype.
     //[self.collectionView registerClass:[ButtonCell class] forCellWithReuseIdentifier:reuseIdentifier];
     
     _buttonData = @[
@@ -96,28 +43,25 @@ static NSString * const reuseIdentifier = @"cell";
                    @[@"Inside",@"house.png",@"house"],
                    @[@"Basement",@"basement.jpeg",@"dungeon"],
                    @[@"Game",@"games.jpeg",@"playing"],
-                   @[@"Shop",@"shopping.png",@"shop"],
+                   @[@"Shop",@"shopping.png",@"shop2"],
                    @[@"Get Item",@"triforce.png",@"getTriforce"],
                    @[@"Forest",@"forest.jpeg",@"forest-lost"],
                    @[@"Train",@"train.png",@"train"],
                    @[@"Boat",@"boat.jpg",@"greatsea"],
                    @[@"Sketchy Neighborhood",@"enemies.jpeg",@"danger"],
                    @[@"I died!",@"gameover.png",@"gameover"],
-
                    ];
     
     self.motionManager = [CMMotionActivityManager new];
     [self.motionManager startActivityUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMMotionActivity *activity) {
         NSLog(@"New Motion event: %@",activity);
-        // user has started running and the music is not already running (since didSelect is actually a toggle)
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+        
+        // user has started running and the music is not already running (since didSelect is actually a toggle)
         if ([activity running] && !_musicAutomaticallyStarted) {
-//            [self collectionView:self.collectionView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-
             [self.collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
             NSURL *musicURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:_buttonData[0][BUTTONINDEX_MUSIC] ofType:@"mp3"]];
             _audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:musicURL error:nil];
-            //        _audioPlayer.volume=1.0;
             _audioPlayer.numberOfLoops = -1;
             [_audioPlayer prepareToPlay];
             [_audioPlayer play];
@@ -171,12 +115,10 @@ static NSString * const reuseIdentifier = @"cell";
     cell.buttonImage.image = [UIImage imageNamed:_buttonData[item][BUTTONINDEX_IMAGE]];
     
     cell.selectedBackgroundView = [UIView new];
-//    [cell.selectedBackgroundView setBackgroundColor:[UIColor whiteColor]];
     cell.selectedBackgroundView.layer.cornerRadius = 10;
     cell.selectedBackgroundView.layer.borderWidth = 2;
     cell.selectedBackgroundView.layer.borderColor = [[UIColor blackColor] CGColor];
 
-//    cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_buttonImages[row]]];
     return cell;
 }
 
@@ -191,7 +133,6 @@ static NSString * const reuseIdentifier = @"cell";
     } else {
         NSURL *musicURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:_buttonData[item][BUTTONINDEX_MUSIC] ofType:@"mp3"]];
         _audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:musicURL error:nil];
-//        _audioPlayer.volume=1.0;
         _audioPlayer.numberOfLoops = -1;
         [_audioPlayer prepareToPlay];
         [_audioPlayer play];
@@ -200,22 +141,6 @@ static NSString * const reuseIdentifier = @"cell";
         _previouslySelectedIndex = indexPath;
     }
 }
-
-/*
-- (void)collectionView:(nonnull UICollectionView *)collectionView didDeselectItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
-//    ButtonCell *cell = [self.collectionView cellForItemAtIndexPath:indexPath];
-//    [_audioPlayer stop];
-    
-//    [self stopMusicFromCell:cell];
-}
-
-- (void)stopMusicFromCell: (ButtonCell *)cell {
-    [_audioPlayer stop];
-    NSLog(@"Deselecting %@",cell.label.text);
-    cell.layer.cornerRadius = 0;
-    cell.layer.borderWidth = 0;
-}
- */
 
 #pragma mark <UICollectionViewDelegate>
 
@@ -229,19 +154,5 @@ static NSString * const reuseIdentifier = @"cell";
     return YES;
 }
 
-/*
-// Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath {
-	return NO;
-}
-
-- (BOOL)collectionView:(UICollectionView *)collectionView canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
-	return NO;
-}
-
-- (void)collectionView:(UICollectionView *)collectionView performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
-	
-}
-*/
 
 @end

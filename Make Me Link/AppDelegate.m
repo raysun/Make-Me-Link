@@ -2,7 +2,7 @@
 //  AppDelegate.m
 //  Make Me Link
 //
-//  Created by Karen and Ray Sun on 7/19/15.
+//  Created by Ray Sun on 7/19/15.
 //  Copyright © 2015 Ray Sun. All rights reserved.
 //
 
@@ -18,16 +18,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    // Set AudioSession
+    // Keeps music playing even when you leave the app
     NSError *sessionError = nil;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
-    
-    /* Pick any one of them */
-    // 1. Overriding the output audio route
-    //UInt32 audioRouteOverride = kAudioSessionOverrideAudioRoute_Speaker;
-    //AudioSessionSetProperty(kAudioSessionProperty_OverrideAudioRoute, sizeof(audioRouteOverride), &audioRouteOverride);
-    
-    
+
     return YES;
 }
 
